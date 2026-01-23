@@ -2,10 +2,6 @@ import { env } from "@/env";
 
 const API_URL = env.API_URL;
 
-//* No Dynamic and No { cache: no-store } : SSG -> Static Page
-//* { cache: no-store } : SSR -> Dynamic Page
-//* next: { revalidate: 10 } : ISR -> Mix between static and dynamic
-
 interface ServiceOptions {
   cache?: RequestCache;
   revalidate?: number;
@@ -22,7 +18,7 @@ export const blogService = {
     options?: ServiceOptions,
   ) {
     try {
-      const url = new URL(`${API_URL}/posts`);
+      const url = new URL(`${API_URL}/api/posts`);
 
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
@@ -46,14 +42,22 @@ export const blogService = {
 
       const data = await res.json();
 
-      // This is an example
-      //   if(data.success) {
-      //     return
-      //   }
+      return { data: data, error: null };
+    } catch (err) {
+      console.error("An error occurred:", err);
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+
+  GetBlogById: async function (id: string) {
+    try {
+      const res = await fetch(`${API_URL}/api/post/${id}`);
+      const data = await res.json();
 
       return { data: data, error: null };
     } catch (err) {
-      return { data: null, error: { message: "Something Went Wrong" } };
+      console.log("Something error", err);
+      return { data: null, error: { message: "Something went wrong" } };
     }
   },
 };
